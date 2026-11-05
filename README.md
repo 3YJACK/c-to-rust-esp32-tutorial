@@ -1,4 +1,4 @@
-# c-to-rust-esp32-no-std-tutorial
+# c-to-rust-esp32-tutorial
 
 C语言嵌入式开发者的个人Rust no_std嵌入式开发的学习记录，同时也是一份面向有着相似背景开发者的Rust no_std嵌入式开发入门教程。
 

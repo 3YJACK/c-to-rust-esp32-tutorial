@@ -1,4 +1,4 @@
-# c-to-rust-esp32-no-std-tutorial
+# c-to-rust-esp32-tutorial
 
 [中文](README.md) | **English**
 

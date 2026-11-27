@@ -54,7 +54,13 @@ use esp_hal::{
     i2c::master::{Config, I2c},
 };
 
-use ssd1306::{I2CDisplayInterface, Ssd1306, command::AddrMode, rotation::*, size::*};
+use ssd1306::{
+    I2CDisplayInterface, 
+    Ssd1306, 
+    command::AddrMode, 
+    rotation::*, 
+    size::*,
+};
 use embedded_graphics::{ 
     prelude::*,
     mono_font::{ascii::FONT_6X10, MonoTextStyleBuilder},
@@ -194,8 +200,7 @@ i2c外设的配置及创建示例如下：
 
 ```rust
     let interface = I2CDisplayInterface::new(i2c);
-    let mut display = Ssd1306::new(interface, DisplaySize128x64, 
-                                    DisplayRotation::Rotate0);
+    let mut display = Ssd1306::new(interface, ......);
     // ......
 ```
 
@@ -261,11 +266,11 @@ Ssd1306<esp_hal::i2c::master::I2c<'_, Blocking>>
 
 通过**标准接口驱动设备，隔离底层实现**？熟悉Linux的读者，应该都会跟我一样觉得这个机制跟Linux的非常类似。
 
-确实，两者在设计理念上是一致的，但是具体实现却不一样。简单来说，**Linux是运行时的硬件抽象，Rust是编译时的运行抽象**。
+确实，两者在设计理念上是一致的，但是具体实现却不一样。简单来说，**Linux 是运行时的硬件抽象，Rust 是编译期的硬件抽象**。
 
 - **Linux 的做法**： `read(fd, buffer, size)`，内核中的 VFS（虚拟文件系统）会把它转发给具体的 ext4、FAT32 驱动，或者转发给具体的 NVMe、SD 卡驱动。应用层代码**不关心**硬盘是 SATA 还是 USB。
 
-- **Rust `embedded-hal` 的做法**： `i2c.write(address, data)`，这个 Trait 方法在编译时会被替换成具体的 `esp_hal::i2c::I2C` 或 `stm32_hal::i2c::I2C` 的实现。驱动代码**不关心**硬件平台用的是 ESP32 还是 STM32。
+- **Rust `embedded-hal` 的做法**： `i2c.write(address, data)`，这个 Trait 方法在编译时会被替换成具体的 `esp_hal::i2c::master::I2c` 或对应 STM32 HAL 类型的实现。驱动代码**不关心**硬件平台用的是 ESP32 还是 STM32。
 
 |          | **Linux 抽象**                | **Rust 抽象**                                    |
 | -------- | --------------------------- | ---------------------------------------------- |

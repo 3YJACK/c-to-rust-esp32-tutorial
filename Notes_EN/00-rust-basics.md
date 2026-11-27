@@ -254,7 +254,7 @@ As for using the return value, see the following code:
 let value = if condition { 1 } else { 2 };    // if the condition holds, return 1 and assign to value; otherwise return 2
 ```
 
-Note that the return types of all branches must be the same, otherwise a compile error occurs. When an `if/else` structure is used to return a value, it must end with a semicolon; only then can the whole structure be regarded as an expression; otherwise it is merely a logical control statement.
+All branches must evaluate to the same type, otherwise a compile error occurs. Note that `if/else` is itself an expression: the semicolon in `let value = if ... { ... } else { ... };` terminates the `let` statement, not the `if` expression. Without the `let` binding, the same `if` expression can be used as a statement without a trailing semicolon.
 
 ### Loops
 
@@ -359,7 +359,7 @@ For a mutable value, taking a mutable reference is essentially the same as a poi
 let mut x = 5;
 let y = &x;      // y borrows x
 
-// x = 100；    // × compile error; x cannot be modified at this point because y is still alive
+// x = 100;     // × compile error: x cannot be modified here because y is still alive
 
 println!("{}", y); // prints 5
 
@@ -372,7 +372,7 @@ let y2 = &x;
 println!("{}", y2); // prints 100
 ```
 
-**Note**: Regarding the example above, the lifetime of `y` differs across Rust editions. In Rust before the 2018 edition, the lifetime of a reference strictly followed the `{}` scope of the code block, and the referenced value could only be modified after leaving the scope. In Rust 2018 and later, the last use of a reference is treated as the end point of its lifetime, as shown in the example above.
+**Note**: Non-lexical lifetimes (NLL) have been enabled since Rust 1.31 and apply to both the 2015 and 2018 editions. A reference's lifetime ends at its last use, not necessarily at the closing brace of its scope, which is why `x` can be modified after the final `println!("{}", y)` in the example above.
 
 **4. Strings**
 
@@ -484,16 +484,16 @@ fn main() {
 
 **Generics are a mechanism of "not specifying a concrete type when writing code, and filling in the concrete type only when it is used."** Its goal is: **one piece of code adapting to multiple types, while maintaining type safety and with no runtime overhead.**
 
-Take a function that compares sizes as an example. In C, without generics:
+Take a function that compares two values as an example. In C, you write one function per type:
 
 ```c
-fn max_i32(a: i32, b: i32) -> i32 { if a > b { a } else { b } }
-fn max_f32(a: f32, b: f32) -> f32 { if a > b { a } else { b } }
-fn max_u8(a: u8, b: u8) -> u8 { if a > b { a } else { b } }
-// ...and also types like u16, u32, i64, f64
+int max_i32(int a, int b) { return a > b ? a : b; }
+float max_f32(float a, float b) { return a > b ? a : b; }
+unsigned char max_u8(unsigned char a, unsigned char b) { return a > b ? a : b; }
+/* ...and again for int16_t, uint32_t, int64_t, double, ... */
 ```
 
-Code reusability is low; each different type needs a corresponding comparison function to be defined, and if macros are used, type safety cannot be guaranteed.
+Code reuse is poor: every type needs its own function. C11 `_Generic` can select one at compile time, but you still have to write and maintain each variant, and a macro-based version loses the type checking that Rust gives you here.
 
 For Rust, when generics can be used:
 
@@ -535,13 +535,13 @@ It explicitly separates the correct result from the error, and regardless of whi
 
 The commonly used error-handling methods for the `Result` type are as follows:
 
-1. **`.unwarp()`**
+1. **`.unwrap()`**
 
-Using `.unwarp()` on a `Result` type is a simple and crude way to handle errors. If the result is a success, the data is taken out; if the result is an error, it **directly crashes the system to terminate the program** and prints the error code information.
+Using `.unwrap()` on a `Result` type is a simple and crude way to handle errors. If the result is a success, the data is taken out; if the result is an error, it **directly crashes the system to terminate the program** and prints the error code information.
 
 2. **`.expect()`**
 
-The `.expect("msg")` method behaves the same as `.unwarp()`, with the difference that when it triggers a system crash, it additionally **prints the specified "msg" message**.
+The `.expect("msg")` method behaves the same as `.unwrap()`, with the difference that when it triggers a system crash, it additionally **prints the specified "msg" message**.
 
 ```rust
 let value = result.expect("Initialization failed");  // the corresponding log message is printed when the system crashes
@@ -567,14 +567,14 @@ An expression with `?`, when an error occurs at runtime, returns the error value
 Take the following code as an example:
 
 ```rust
-fn function_a() -> Result<()> {
+fn function_a() -> Result<(), E> {
     ...
     // If function_b() returns an error, function_a() also returns immediately, passing the error result upward
     function_b()?; 
     ...
 }
 
-fn main() -> Result<()> {
+fn main() -> Result<(), E> {
     ...
     // If function_a() returns an error, main() also returns, the program exits and prints the corresponding error result
     function_a()?;

@@ -98,4 +98,18 @@ C语言嵌入式开发者的个人Rust no_std嵌入式开发的学习记录，�
 
 笔记中的代码示例可直接在对应的 `./Code/` 工程中找到完整版本。建议边读笔记边对照源码，遇到不理解的地方直接修改源码跑一跑。
 
-# 
+## 构建与烧录
+
+`Code/` 下的每个工程都是独立的 Cargo package。进入对应目录后执行：
+
+```bash
+cargo build                      # 编译
+cargo espflash flash --monitor   # 烧录并打开串口监视器
+```
+
+工程自带的 `.cargo/config.toml` 已配置 `espflash flash --monitor --chip esp32s3` 作为 runner，因此 `cargo run` 也可以直接使用。
+
+## 许可证
+
+- `Code/` 及仓库中的源代码：[MIT](LICENSE)
+- `Notes/` 与 `Notes_EN/` 中的笔记：[CC0 1.0](LICENSE-DOCS.md)——放弃版权，转载和改编无需署名

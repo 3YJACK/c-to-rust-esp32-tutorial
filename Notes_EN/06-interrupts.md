@@ -259,7 +259,7 @@ In Rust, global variables are declared with `static` and require their values to
 static BUTTON: Mutex<RefCell<Option<Input>>> = Mutex::new(RefCell::new(None));
 static LED: Mutex<RefCell<Option<Output>>> = Mutex::new(RefCell::new(None));
 
-fn main() -> !{
+fn main() -> ! {
     critical_section::with(|cs| {
         BUTTON.replace(button);
         LED.replace(led);  

@@ -108,7 +108,7 @@ fn main() -> ! {
     esp_alloc::heap_allocator!(#[esp_hal::ram(reclaimed)] size: 73744);
 
     // Initialize I2C by default, details as follows:
-    // frequency：100kHz, timeout：disabled, software_timeout：disabled
+    // frequency: 100 kHz, timeout: disabled, software_timeout: disabled
     // scl_st_timeout: 16, scl_main_st_timeout: 16
     let i2c_config = Config::default(); 
     let i2c = I2c::new(peripherals.I2C0, i2c_config)
@@ -261,11 +261,11 @@ Then it calls the concrete implementation of esp_hal, and further down are the E
 
 Driving devices through **standard interfaces, isolating the underlying implementation**? Readers familiar with Linux should, like me, feel that this mechanism is very similar to that of Linux.
 
-Indeed, the two are consistent in design philosophy, but the concrete implementations are different. Simply put, **Linux is runtime hardware abstraction, while Rust is compile-time runtime abstraction**.
+Indeed, the two are consistent in design philosophy, but the concrete implementations are different. Simply put, **Linux provides hardware abstraction at runtime, while Rust does it at compile time**.
 
 - **Linux's approach**: `read(fd, buffer, size)`, the VFS (Virtual File System) in the kernel forwards it to the concrete ext4 or FAT32 driver, or to the concrete NVMe or SD card driver. The application-layer code **does not care** whether the disk is SATA or USB.
 
-- **Rust `embedded-hal`'s approach**: `i2c.write(address, data)`, this trait method is replaced at compile time with the concrete implementation of `esp_hal::i2c::I2C` or `stm32_hal::i2c::I2C`. The driver code **does not care** whether the hardware platform uses ESP32 or STM32.
+- **Rust `embedded-hal`'s approach**: `i2c.write(address, data)`, this trait method is replaced at compile time with the concrete implementation of `esp_hal::i2c::master::I2c` or the corresponding STM32 HAL type. The driver code **does not care** whether the hardware platform uses ESP32 or STM32.
 
 |          | **Linux abstraction**                | **Rust abstraction**                                    |
 | -------- | ----------------------------------- | ------------------------------------------------------ |

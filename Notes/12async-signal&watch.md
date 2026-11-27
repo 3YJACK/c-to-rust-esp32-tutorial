@@ -286,15 +286,15 @@ let  watch_rev1 = WATCH.receiver().expect("Failed to create watch receiver 1");
 
 ```rust
 // 发送watch并携带数据
-watch_send.send(true)；
+watch_send.send(true);
 // 等待watch更新并获取最新值
-watch_rev0.changed().await；
+watch_rev0.changed().await;
 // 不等待watch更新直接获取当前数值
 watch_rev1.get().await; 
 // .changed()的同步非阻塞版本
-watch_rev0.try_changed()；
+watch_rev0.try_changed();
 // .get()的同步非阻塞版本
-watch_rev1.try_get()；
+watch_rev1.try_get();
 ```
 
 关于`Watch`更多详情可以查阅官方文档了解。

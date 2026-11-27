@@ -184,13 +184,13 @@ In the async task `blink`, the parameter passed in is `mut led: Output<'static>`
 
 Requiring task arguments to have the `'static` lifetime is not a mandate of the Rust language itself; it is **a core and necessary characteristic of `Embassy`'s executor design**.
 
-At program startup, the `main` function creates tasks and adds them to scheduling. However, **the `main` function itself returns**, and its local variables become invalid as a result. Yet the spawned tasks may continue running independently in the background. This means **a task's lifetime is completely independent of the context that spawned it**.
+At startup, `main` spawns tasks into the executor's scheduler. In this example `main` is declared `-> !` and never returns, so that is not the reason for `'static`: `Spawner::spawn()` stores each task in a scheduler that outlives the call and detaches it from the scope that created it. Any stack data borrowed from `main` could therefore be dropped while the task is still running.
 
-If a task holds a reference to a local variable in `main`, then after `main` returns that variable will be destroyed while the task still lives — creating a **dangling reference**, a memory-safety problem strictly forbidden in Rust.
+If a task held a reference to a local variable of `main`, it could keep using that reference after the variable's stack frame was gone — a **dangling reference**, which Rust strictly forbids.
 
-In the case of a semantic move, this problem does not occur. But in the case of borrowing, there is a risk of a dangling reference.
+Moving ownership into a task avoids this problem: the task owns the value, so nothing outside it can drop the value. Borrowing a short-lived local does not.
 
-Therefore `embassy` requires all task functions to have the `'static` lifetime. This ensures **that any data owned by a task will not be destroyed during its execution.**
+Therefore `embassy` requires task arguments to be `'static`, which ensures **that whatever a task holds stays valid for the whole time the task can run**.
 
 ## The "binding" nature of mutability
 
@@ -198,4 +198,4 @@ Some readers may wonder: since `led` is defined as immutable, why can it be pass
 
 This is a concept that is easy to confuse when learning Rust. The key is that **mutability is an external property of a binding, not an intrinsic property of the value itself**.
 
-When `led` is defined in `main`, it is bound with an immutable attribute, so no mutable operations can be performed on it inside `main`. But when it undergoes a semantic move into the `blink` task, the old immutable attribute is "unbound", and it can be redeclared as mutable inside `blink`. **Whenever a value undergoes a semantic move, its mutability can be redeclared.** In the case of borrowing, however, strict rule restrictions apply.
+When `led` is defined in `main`, its binding is immutable, so `main` cannot use it mutably. Moving it into the `blink` task transfers ownership; the parameter `mut led` in `blink` then creates a **new, mutable binding** to that same value. The move does not "unbind" the old mutability — it hands ownership to a scope that is free to declare its own binding as mutable. Borrowing is different: an `&mut` reference to a value still owned by `main` would have to obey the borrow rules for as long as the task runs.

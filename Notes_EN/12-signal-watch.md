@@ -286,15 +286,15 @@ The main usage of `Watch` is as follows:
 
 ```rust
 // Send the watch carrying data
-watch_send.send(true)；
+watch_send.send(true);
 // Wait for the watch to update and get the latest value
-watch_rev0.changed().await；
+watch_rev0.changed().await;
 // Get the current value directly without waiting for a watch update
 watch_rev1.get().await; 
 // Synchronous non-blocking version of .changed()
-watch_rev0.try_changed()；
+watch_rev0.try_changed();
 // Synchronous non-blocking version of .get()
-watch_rev1.try_get()；
+watch_rev1.try_get();
 ```
 
 For more details about `Watch`, you can consult the official documentation.

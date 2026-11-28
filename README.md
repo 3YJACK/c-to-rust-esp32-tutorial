@@ -111,5 +111,4 @@ cargo espflash flash --monitor   # 烧录并打开串口监视器
 
 ## 许可证
 
-- `Code/` 及仓库中的源代码：[MIT](LICENSE)
-- `Notes/` 与 `Notes_EN/` 中的笔记：[CC0 1.0](LICENSE-DOCS.md)——放弃版权，转载和改编无需署名
+[MIT](LICENSE)

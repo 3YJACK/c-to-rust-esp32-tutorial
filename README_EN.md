@@ -131,5 +131,4 @@ cargo espflash flash --monitor   # flash and open the serial monitor
 
 ## License
 
-- Source code under `Code/` and elsewhere in this repository: [MIT](LICENSE)
-- Notes in `Notes/` (Chinese) and `Notes_EN/` (English): [CC0 1.0](LICENSE-DOCS.md) — public-domain dedication; no attribution required
+ [MIT](LICENSE)
